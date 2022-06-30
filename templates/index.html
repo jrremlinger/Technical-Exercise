@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Parsed Emails</title>
+	<link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+	<h1 id="title">Parsed Emails</h1>
+	<ul id="main-wrapper"></ul>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script type="text/javascript">
+		emails = JSON.parse( '{{ data | tojson }}' );	// Import parsed data from the Flask server
+
+		// Build an HTML DOM element for each email and then append it to the list-object
+		for (email in emails) {
+			DOMStr = '<li><div class="email-container">\
+				<img style="min-width: 100px;" src = "static/email_black_24dp.svg" alt="Mail Icon"/>\
+				<ul style="padding-left: 1em">\
+				<li><span style="font-weight: bold">Sender:</span> ' + emails[email].from + '</li>';
+			
+			// Handle multiple recipients
+			for (recipient in emails[email].to) {
+				// If there are multiple recipients, each will have an index number shown, starting at 1
+				DOMStr += '<li><span style="font-weight: bold">Recipient' + (emails[email].to.length > 1 ? ' ' + (parseInt(recipient) + 1) : '') + ':</span> ' + emails[email].to[recipient] + '</li>';
+			}
+
+			DOMStr += '<li><span style="font-weight: bold">Date:</span> ' + emails[email].date + '</li>\
+				<li><span style="font-weight: bold">Subject:</span> ' + emails[email].subject + '</li>\
+				<li><span style="font-weight: bold">Message-ID:</span> ' + emails[email].message_id[0].slice(1, -1) + '</li>\
+				</ul></div></li>'
+			
+			$('#main-wrapper').append(DOMStr);
+		}
+	</script>
+</body>
+</html>
